@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production builds
+dist/
+build/
+client/dist/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS Files
+.DS_Store
+*.pem
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Raw Resource Scrapes / Dumps (already extracted into client/public)
+analytics.twitter.com/
+cca-lite.coinbase.com/
+connect.facebook.net/
+e.clarity.ms/
+fonts.googleapis.com/
+fonts.gstatic.com/
+fonts.reown.com/
+litmexpresale.com/
+nowpayments.io/
+presale-node.litmexpresale.com/
+scripts.clarity.ms/
+static.ads-twitter.com/
+static.cloudflareinsights.com/
+t.co/
+www.clarity.ms/
+www.googletagmanager.com/

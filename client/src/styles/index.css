@@ -1,0 +1,195 @@
+@import "tailwindcss";
+@import "./fonts.css";
+@import "./animations.css";
+
+@layer base {
+  :root {
+    --bg-primary: #050b12;
+    --bg-card: #000720;
+    --bg-surface: #191919;
+    --bg-table: #070b14;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-highlight: rgba(59, 130, 246, 0.3);
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: #ffffff;
+    font-family: var(--font-montserrat);
+  }
+}
+
+/* ===================================================
+   Exact .presale-card CSS recovered from source bundle
+   =================================================== */
+
+.presale-card .live-dot {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.presale-card .live-badge {
+  animation: float 3s ease-in-out infinite;
+}
+
+.presale-card .shimmer-effect {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.07) 50%, transparent 100%);
+  background-size: 1000px 100%;
+  animation: shimmer 3s infinite;
+}
+
+.presale-card .gradient-border {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.52), rgba(17, 20, 24, 0.1));
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.presale-card .payment-tab-panel {
+  animation: tab-slide 0.22s ease;
+}
+
+.presale-card .coin-button {
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.presale-card .coin-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.25);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s, height 0.5s;
+}
+
+.presale-card .coin-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.presale-card .timer-box {
+  transition: all 0.3s ease;
+}
+
+.presale-card .timer-box:hover {
+  transform: scale(1.08);
+  background: linear-gradient(135deg, #1a2035, #0d2457);
+}
+
+.presale-card .stage-card {
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.presale-card .stage-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.presale-card .pay-switcher {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 4px;
+  position: relative;
+}
+
+.presale-card .pay-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: calc(50% - 4px);
+  left: 4px;
+  border-radius: 10px;
+  background: #1d32cd;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(49, 52, 232, 0.3);
+}
+
+.presale-card .pay-pill.fiat {
+  transform: translate(100%);
+}
+
+.presale-card .pay-tab-btn {
+  position: relative;
+  z-index: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 11px 0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.71);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: color 0.22s;
+  letter-spacing: 0.2px;
+}
+
+.presale-card .pay-tab-btn.active {
+  color: #ffffff;
+}
+
+.presale-card .receive-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(34, 211, 238, 0.05);
+  border: 1px solid rgba(34, 211, 238, 0.14);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+/* Brand gradient */
+.bg-brand-gradient {
+  background: linear-gradient(90deg, #e83167, #1d32cd) !important;
+}
+
+/* Progress bar exact styling from source */
+.progress-stripes {
+  opacity: 0.6;
+  background: repeating-linear-gradient(135deg, rgba(28, 77, 182, 0.35) 0 10px, rgba(28, 77, 182, 0.15) 10px 20px);
+  animation: 1.3s linear infinite stripesMove;
+}
+
+.progress-shimmer {
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.45), transparent 70%);
+  animation: 2.4s infinite shimmerMove;
+}
+
+.progress-dot span {
+  animation: 1.6s ease-in-out infinite dotPulse;
+}
+
+.filter-white {
+  filter: brightness(0) invert(1);
+}
+
+/* Custom scrollbar matching original */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050b12;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #192231;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #25334a;
+}
