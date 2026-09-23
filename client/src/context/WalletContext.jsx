@@ -1,5 +1,5 @@
 // client/src/context/WalletContext.jsx
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { DEFAULT_CHAIN_ID } from "../config/web3Config.js";
 import web3Service, { connectWallet as rawConnectWallet } from "../services/web3Service.js";
 import api from "../services/api.js";
@@ -12,6 +12,11 @@ export function WalletProvider({ children }) {
   const [connecting, setConnecting] = useState(false);
   const [bnbPrice, setBnbPrice] = useState(783.06);
   const [balances, setBalances] = useState({ bnb: "0.0000", shuk: "0.00", usdt: "0.00" });
+
+  const accountRef = useRef(account);
+  useEffect(() => {
+    accountRef.current = account;
+  }, [account]);
 
   const isConnected = Boolean(account);
   const isCorrectChain = chainId === 56;
@@ -40,25 +45,35 @@ export function WalletProvider({ children }) {
   }, []);
 
   // Refresh all balances
-  const refreshBalances = useCallback(async (targetAccount = account) => {
-    if (!targetAccount) {
+  const refreshBalances = useCallback(async (targetAccount) => {
+    const acc = targetAccount || accountRef.current;
+    if (!acc) {
       setBalances({ bnb: "0.0000", shuk: "0.00", usdt: "0.00" });
       return;
     }
     const [bnb, shuk, usdt] = await Promise.all([
-      web3Service.getNativeBalance(targetAccount),
-      web3Service.getShukBalance(targetAccount),
-      web3Service.getUsdtBalance(targetAccount)
+      web3Service.getNativeBalance(acc),
+      web3Service.getShukBalance(acc),
+      web3Service.getUsdtBalance(acc)
     ]);
     setBalances({ bnb, shuk, usdt });
-  }, [account]);
+  }, []);
 
   // Connect Wallet
   const connect = useCallback(async () => {
     setConnecting(true);
     try {
+      try {
+        localStorage.removeItem("shukrana_disconnected");
+        localStorage.setItem("shukrana_wallet_connected", "true");
+      } catch (e) {
+        // Ignore storage errors
+      }
+
       const connectedAccount = await rawConnectWallet();
       setAccount(connectedAccount);
+      accountRef.current = connectedAccount;
+
       const cid = await web3Service.getChainId();
       setChainId(cid);
       await refreshBalances(connectedAccount);
@@ -85,7 +100,19 @@ export function WalletProvider({ children }) {
 
   // Disconnect Wallet
   const disconnect = useCallback(() => {
+    try {
+      localStorage.setItem("shukrana_disconnected", "true");
+      localStorage.removeItem("shukrana_wallet_connected");
+    } catch (e) {
+      // Ignore storage errors
+    }
+
+    if (web3Service.clear) {
+      web3Service.clear();
+    }
+
     setAccount(null);
+    accountRef.current = null;
     setBalances({ bnb: "0.0000", shuk: "0.00", usdt: "0.00" });
   }, []);
 
@@ -153,12 +180,22 @@ export function WalletProvider({ children }) {
   // Listeners & Auto-detect existing connection
   useEffect(() => {
     async function checkAuth() {
+      // Do not auto-reconnect if user explicitly clicked Disconnect
+      try {
+        if (localStorage.getItem("shukrana_disconnected") === "true") {
+          return;
+        }
+      } catch (e) {
+        // Ignore storage error
+      }
+
       if (web3Service.isMetaMaskAvailable()) {
         const accounts = await web3Service.getAccounts();
         const cid = await web3Service.getChainId();
         setChainId(cid);
         if (accounts && accounts.length > 0) {
           setAccount(accounts[0]);
+          accountRef.current = accounts[0];
           refreshBalances(accounts[0]);
 
           // ✅ Register the returning wallet silently
@@ -178,7 +215,12 @@ export function WalletProvider({ children }) {
     if (typeof window !== "undefined" && window.ethereum) {
       const handleAccountsChanged = (accs) => {
         if (accs && accs.length > 0) {
+          try {
+            localStorage.removeItem("shukrana_disconnected");
+            localStorage.setItem("shukrana_wallet_connected", "true");
+          } catch (e) {}
           setAccount(accs[0]);
+          accountRef.current = accs[0];
           refreshBalances(accs[0]);
         } else {
           disconnect();

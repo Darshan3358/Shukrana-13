@@ -17,7 +17,8 @@ import {
   Check,
   ArrowUpRight,
   Clock,
-  Sparkles
+  Sparkles,
+  LogOut
 } from 'lucide-react';
 
 export const Profile = () => {
@@ -174,6 +175,15 @@ export const Profile = () => {
                       <ExternalLink size={12} />
                     </a>
                   </div>
+                  <button
+                    type="button"
+                    onClick={disconnectWallet}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-xs font-semibold transition cursor-pointer"
+                    title="Disconnect Wallet"
+                  >
+                    <LogOut size={12} />
+                    <span>Disconnect</span>
+                  </button>
                 </div>
               </div>
 

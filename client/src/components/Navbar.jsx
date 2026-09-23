@@ -215,11 +215,14 @@ export const Navbar = () => {
                         <ExternalLink size={14} />
                       </a>
                       <button
-                        onClick={() => {
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           disconnectWallet();
                           setWalletDropdownOpen(false);
                         }}
-                        className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-red-500/10 text-red-400 transition"
+                        className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-red-500/10 text-red-400 transition cursor-pointer"
                       >
                         <span>Disconnect</span>
                         <LogOut size={14} />
@@ -357,11 +360,14 @@ export const Navbar = () => {
                 </button>
               ) : (
                 <button
-                  onClick={() => {
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     disconnectWallet();
                     setMobileMenuOpen(false);
                   }}
-                  className="block w-full text-center text-base font-semibold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3"
+                  className="block w-full text-center text-base font-semibold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 cursor-pointer"
                 >
                   Disconnect Wallet
                 </button>

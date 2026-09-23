@@ -9,6 +9,11 @@ class Web3Service {
     this.readOnlyProvider = new ethers.JsonRpcProvider(BSC_CHAINS.MAINNET.rpcUrls[0]);
   }
 
+  clear() {
+    this.provider = null;
+    this.signer = null;
+  }
+
   getEthereum() {
     if (typeof window === "undefined" || !window.ethereum) return null;
     return window.ethereum;
