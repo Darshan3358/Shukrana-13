@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowUpRight, Wallet, Check, Copy, ExternalLink, LogOut, ChevronDown, AlertTriangle } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useWallet } from '../context/WalletContext';
 
 const navLinks = [
   { id: 'how-to-buy', label: 'How to Buy', href: '#how-to-buy' },
@@ -13,7 +14,38 @@ const navLinks = [
 
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [walletDropdownOpen, setWalletDropdownOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const dropdownRef = useRef(null);
   const location = useLocation();
+
+  const {
+    account,
+    isCorrectNetwork,
+    shukBalance,
+    connectWallet,
+    disconnectWallet,
+    switchToBsc,
+    isConnecting
+  } = useWallet();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setWalletDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const copyAddress = () => {
+    if (account) {
+      navigator.clipboard.writeText(account);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const scrollToSection = (e, href) => {
     e.preventDefault();
@@ -69,40 +101,145 @@ export const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-3">
-            <Link
-              to="/profile"
-              className="px-5 py-2 rounded-xl text-[14px] font-semibold text-white bg-brand-gradient hover:brightness-110 hover:shadow-[0_0_20px_rgba(232,49,103,0.4)] transition-all active:scale-[0.97]"
-            >
-              Sign In
-            </Link>
+            {!account ? (
+              <button
+                onClick={connectWallet}
+                disabled={isConnecting}
+                className="group relative inline-flex items-center gap-2.5 px-5 h-[48px] rounded-xl text-[14px] font-semibold text-white bg-brand-gradient hover:brightness-110 hover:shadow-[0_0_22px_rgba(232,49,103,0.45)] transition-all active:scale-[0.97] cursor-pointer"
+              >
+                <Wallet size={17} />
+                <span>{isConnecting ? 'Connecting...' : 'Connect MetaMask'}</span>
+              </button>
+            ) : !isCorrectNetwork ? (
+              <button
+                onClick={switchToBsc}
+                className="inline-flex items-center gap-2 px-4 h-[48px] rounded-xl text-[13px] font-semibold text-yellow-300 bg-yellow-500/20 border border-yellow-500/40 hover:bg-yellow-500/30 transition-all cursor-pointer"
+              >
+                <AlertTriangle size={16} />
+                <span>Switch to BSC</span>
+              </button>
+            ) : (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setWalletDropdownOpen(!walletDropdownOpen)}
+                  className="flex items-center gap-2.5 px-3.5 h-[48px] rounded-xl bg-black/80 border border-white/15 hover:border-white/30 text-white transition-all cursor-pointer shadow-lg"
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-xs text-emerald-400 font-semibold">{shukBalance} SHUK13</span>
+                    <span className="text-[12px] font-mono text-gray-300">
+                      {account.slice(0, 6)}...{account.slice(-4)}
+                    </span>
+                  </div>
+                  <ChevronDown size={14} className="text-gray-400 ml-1" />
+                </button>
+
+                {walletDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-72 bg-[#0d121f] border border-white/15 rounded-2xl p-4 shadow-2xl z-50 text-white animate-fade-in">
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                      <span className="text-xs text-gray-400 uppercase font-semibold">Connected Wallet</span>
+                      <span className="text-[11px] px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 font-medium">
+                        BSC Mainnet
+                      </span>
+                    </div>
+
+                    <div className="py-3 space-y-2 border-b border-white/10">
+                      <div className="flex items-center justify-between bg-black/50 p-2 rounded-xl border border-white/5">
+                        <span className="font-mono text-xs text-gray-300 truncate max-w-[170px]">
+                          {account}
+                        </span>
+                        <button
+                          onClick={copyAddress}
+                          className="p-1.5 hover:bg-white/10 rounded-lg text-gray-300 hover:text-white transition"
+                          title="Copy Address"
+                        >
+                          {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                        </button>
+                      </div>
+
+                      <div className="bg-black/30 p-2.5 rounded-xl border border-white/5">
+                        <div className="text-[11px] text-gray-400">SHUK13 Balance</div>
+                        <div className="text-base font-bold text-emerald-400">{shukBalance} SHUK13</div>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 space-y-2 text-xs">
+                      {account?.toLowerCase() === '0x4f2766f649e23bc2db54753c16d22066bed64bac' && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setWalletDropdownOpen(false)}
+                          className="flex items-center justify-between p-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 font-semibold transition"
+                        >
+                          <span>👑 Admin Dashboard</span>
+                          <ArrowUpRight size={14} />
+                        </Link>
+                      )}
+                      <a
+                        href={`https://bscscan.com/address/${account}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-gray-300 hover:text-white transition"
+                      >
+                        <span>View on BscScan</span>
+                        <ExternalLink size={14} />
+                      </a>
+                      <button
+                        onClick={() => {
+                          disconnectWallet();
+                          setWalletDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-red-500/10 text-red-400 transition"
+                      >
+                        <span>Disconnect</span>
+                        <LogOut size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <a
               href="#presale"
               onClick={(e) => scrollToSection(e, '#presale')}
-              className="group relative inline-flex items-center gap-4 px-6 h-[50px] rounded-2xl font-semibold cursor-pointer overflow-hidden transition-all duration-300 bg-white text-black hover:bg-white/90 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] active:scale-[0.97]"
+              className="group relative inline-flex items-center gap-4 px-6 h-[48px] rounded-xl font-semibold cursor-pointer overflow-hidden transition-all duration-300 bg-white text-black hover:bg-white/90 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] active:scale-[0.97]"
             >
               <span className="relative overflow-hidden leading-none">
-                <span className="block text-xl capitalize transition-transform duration-300 group-hover:-translate-y-full">
+                <span className="block text-lg capitalize transition-transform duration-300 group-hover:-translate-y-full">
                   Buy Now
                 </span>
-                <span className="absolute inset-0 translate-y-full text-xl capitalize transition-transform duration-300 group-hover:translate-y-0">
+                <span className="absolute inset-0 translate-y-full text-lg capitalize transition-transform duration-300 group-hover:translate-y-0">
                   Buy Now
                 </span>
               </span>
-              <span className="flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300 bg-brand-gradient text-white group-hover:rotate-45">
-                <ArrowUpRight size={18} />
+              <span className="flex items-center justify-center w-7 h-7 rounded-lg transition-all duration-300 bg-brand-gradient text-white group-hover:rotate-45">
+                <ArrowUpRight size={15} />
               </span>
             </a>
           </div>
 
           {/* Mobile Actions */}
           <div className="lg:hidden flex items-center gap-2">
-            <a
-              href="#presale"
-              onClick={(e) => scrollToSection(e, '#presale')}
-              className="bg-brand-gradient text-white font-semibold text-md py-1 px-4 rounded-xl hover:shadow-[0_0_20px_rgba(232,49,103,0.4)] transition-all active:scale-95"
-            >
-              Buy Now
-            </a>
+            {!account ? (
+              <button
+                onClick={connectWallet}
+                className="bg-brand-gradient text-white font-semibold text-xs py-2 px-3 rounded-xl active:scale-95"
+              >
+                Connect
+              </button>
+            ) : !isCorrectNetwork ? (
+              <button
+                onClick={switchToBsc}
+                className="bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 font-semibold text-xs py-2 px-2.5 rounded-xl"
+              >
+                Switch BSC
+              </button>
+            ) : (
+              <span className="font-mono text-xs text-emerald-400 bg-black/60 px-2.5 py-1.5 rounded-xl border border-white/10">
+                {account.slice(0, 4)}...{account.slice(-3)}
+              </span>
+            )}
+
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="p-2 relative text-white"
@@ -133,6 +270,22 @@ export const Navbar = () => {
               </button>
             </div>
             <div className="p-6 space-y-4">
+              {account && (
+                <div className="p-3 bg-black/60 rounded-xl border border-white/10 space-y-1">
+                  <div className="text-xs text-gray-400">Wallet Connected:</div>
+                  <div className="font-mono text-xs text-white break-all">{account}</div>
+                  <div className="text-sm font-bold text-emerald-400 mt-1">{shukBalance} SHUK13</div>
+                  {account?.toLowerCase() === '0x4f2766f649e23bc2db54753c16d22066bed64bac' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="mt-2 block w-full text-center py-2 px-3 rounded-xl bg-purple-600/25 hover:bg-purple-600/35 border border-purple-500/30 text-purple-300 font-semibold text-xs transition"
+                    >
+                      👑 Open Admin Dashboard
+                    </Link>
+                  )}
+                </div>
+              )}
               {navLinks.map((link) => (
                 <button
                   key={link.id}
@@ -142,17 +295,31 @@ export const Navbar = () => {
                   {link.label}
                 </button>
               ))}
-              <Link
-                to="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block w-full text-left text-lg font-semibold text-white bg-brand-gradient rounded-xl px-4 py-3 hover:brightness-110 hover:shadow-[0_0_20px_rgba(232,49,103,0.4)] transition-all"
-              >
-                Sign In
-              </Link>
+              {!account ? (
+                <button
+                  onClick={() => {
+                    connectWallet();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-center text-lg font-semibold text-white bg-brand-gradient rounded-xl px-4 py-3 hover:brightness-110 transition-all"
+                >
+                  Connect MetaMask
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    disconnectWallet();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-center text-base font-semibold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3"
+                >
+                  Disconnect Wallet
+                </button>
+              )}
               <a
                 href="#presale"
                 onClick={(e) => scrollToSection(e, '#presale')}
-                className="block w-full text-center mt-6 bg-brand-gradient text-white font-semibold text-lg py-4 rounded-xl hover:shadow-[0_0_25px_rgba(232,49,103,0.4)] transition-all"
+                className="block w-full text-center mt-4 bg-white text-black font-semibold text-lg py-3 rounded-xl hover:bg-white/90 transition-all"
               >
                 Buy Now
               </a>

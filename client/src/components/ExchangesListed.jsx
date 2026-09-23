@@ -3,11 +3,11 @@ import { Copy, Check, ArrowUpRight } from 'lucide-react';
 
 const exchanges = [
   {
-    name: "Binance",
+    name: "BscScan",
     logo: "/images/logo/1839.png",
-    description: "World’s largest crypto exchange by volume.",
-    link: "https://web3.binance.com/en-IN/token/sol/Bm2y8RLPLeZuvUfQ7m3UKRiHGewTpzYt7pX8ZpzimM7d?utm_source=hometokensearch&utm_medium=binance",
-    btnText: "Trade Now"
+    description: "Official Binance Smart Chain Explorer.",
+    link: "https://bscscan.com/token/0x860d6Ee29C12A0C023Fc03741348Dd3d15596f95",
+    btnText: "View Token"
   },
   {
     name: "CoinMarketCap",
@@ -34,7 +34,7 @@ const exchanges = [
 
 export const ExchangesListed = () => {
   const [copied, setCopied] = useState(false);
-  const contractAddress = "Bm2y8RLPLeZuvUfQ7m3UKRiHGewTpzYt7pX8ZpzimM7d";
+  const contractAddress = "0x860d6Ee29C12A0C023Fc03741348Dd3d15596f95";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(contractAddress);

@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 
 export const connectDB = async () => {
-  const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/litmex_presale';
+  const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://fanqie:fanqie123@cluster0.f8acy45.mongodb.net/Shukrana13';
   try {
     const conn = await mongoose.connect(mongoURI, {
-      serverSelectionTimeoutMS: 2000
+      serverSelectionTimeoutMS: 10000
     });
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected: ${conn.connection.host} (DB: ${conn.connection.name})`);
     return true;
   } catch (error) {
     console.warn(`MongoDB Connection Notice: ${error.message}. Running with in-memory fallback state.`);

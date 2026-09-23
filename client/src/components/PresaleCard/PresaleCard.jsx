@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Wallet, CreditCard, ChevronDown, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, Wallet, CreditCard, ChevronDown, ArrowUpRight, CheckCircle2, ExternalLink, AlertCircle } from 'lucide-react';
 import CryptoModal from './CryptoModal';
-import { getPresalePrice, submitPayment } from '../../services/api';
+import { getPresalePrice } from '../../services/api';
+import { useWallet } from '../../context/WalletContext';
 
 export const PresaleCard = () => {
+  const {
+    account,
+    isCorrectNetwork,
+    shukBalance,
+    bnbBalance,
+    usdtBalance,
+    bnbPrice,
+    connectWallet,
+    switchToBsc,
+    executePresaleBuy
+  } = useWallet();
+
   const [presaleData, setPresaleData] = useState({
     priceUsd: 0.03633,
     nextPriceUsd: 0.19896,
@@ -22,22 +35,25 @@ export const PresaleCard = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
-  const [txSuccess, setTxSuccess] = useState(false);
+  const [buyStatus, setBuyStatus] = useState('');
+  const [lastTxHash, setLastTxHash] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const fetchPresaleStats = async () => {
+    const res = await getPresalePrice();
+    if (res?.data) {
+      setPresaleData({
+        priceUsd: res.data.priceUsd || 0.03633,
+        nextPriceUsd: res.data.nextPriceUsd || 0.19896,
+        totalUsdRaised: res.data.totalUsdRaised || 12337211.48,
+        targetUsdt: res.data.currentStage?.targetUsdt || res.data.targetUsdt || 15125000,
+        investors: res.data.totalInvestors || 19240
+      });
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await getPresalePrice();
-      if (res?.data) {
-        setPresaleData({
-          priceUsd: res.data.priceUsd || 0.03633,
-          nextPriceUsd: res.data.nextPriceUsd || 0.19896,
-          totalUsdRaised: res.data.totalUsdRaised || 12337211.48,
-          targetUsdt: res.data.currentStage?.targetUsdt || res.data.targetUsdt || 15125000,
-          investors: res.data.totalInvestors || 19240
-        });
-      }
-    };
-    fetchData();
+    fetchPresaleStats();
   }, []);
 
   const price = presaleData.priceUsd || 0.03633;
@@ -49,20 +65,45 @@ export const PresaleCard = () => {
   );
 
   const handleBuy = async () => {
-    if (numAmount <= 0) return;
+    setErrorMessage('');
+    setLastTxHash(null);
+
+    // 1. Check wallet connection
+    if (!account) {
+      await connectWallet();
+      return;
+    }
+
+    // 2. Check network
+    if (!isCorrectNetwork) {
+      await switchToBsc();
+      return;
+    }
+
+    if (numAmount <= 0) {
+      setErrorMessage('Please enter an amount greater than 0.');
+      return;
+    }
+
     setIsBuying(true);
+    setBuyStatus('Requesting approval & transaction in MetaMask...');
+
     try {
-      await submitPayment({
-        amount: String(numAmount),
-        currency: selectedCrypto.symbol,
-        usdValue: String(numAmount),
-        txHash: '0x' + Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
-      });
-      setTxSuccess(true);
-      setTimeout(() => setTxSuccess(false), 4000);
-    } catch {
-      setTxSuccess(true);
-      setTimeout(() => setTxSuccess(false), 4000);
+      const paymentMethod = selectedCrypto.symbol === 'BNB' ? 'BNB' : 'USDT';
+      setBuyStatus('Broadcasting & confirming on BSC...');
+      
+      const txHash = await executePresaleBuy(numAmount, paymentMethod, price);
+      
+      if (txHash) {
+        setLastTxHash(txHash);
+        setBuyStatus('Confirmed on Binance Smart Chain!');
+        // Re-fetch presale totals to reflect updated ledger
+        setTimeout(fetchPresaleStats, 1000);
+      }
+    } catch (err) {
+      console.error('Presale purchase error:', err);
+      const msg = err?.reason || err?.message || 'Transaction was cancelled or failed.';
+      setErrorMessage(msg.length > 90 ? msg.slice(0, 90) + '...' : msg);
     } finally {
       setIsBuying(false);
     }
@@ -161,10 +202,39 @@ export const PresaleCard = () => {
               {/* Amount Input & Crypto Selector */}
               <div className="mt-3">
                 <div className="space-y-3">
+                  {/* Account Balance Row if connected */}
+                  {account && (
+                    <div className="flex items-center justify-between text-xs px-1 py-1 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-gray-300">
+                        Balance:{' '}
+                        <strong className="text-white">
+                          {selectedCrypto.symbol === 'BNB' ? `${bnbBalance} BNB` : `${usdtBalance} USDT`}
+                        </strong>
+                      </span>
+                      <span className="text-emerald-400 font-semibold">
+                        Your SHUK13: {shukBalance}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-3 items-stretch">
                     {/* Enter Amount */}
                     <div className="relative">
-                      <span className="text-xs md:text-md text-white/70 mb-1 block">Enter Amount</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs md:text-sm text-white/70 block">Enter Amount</span>
+                        <div className="flex items-center gap-1">
+                          {['100', '500', '1000'].map((preset) => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => setAmount(preset)}
+                              className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-gray-300 cursor-pointer"
+                            >
+                              ${preset}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                       <div className="flex items-center bg-black border border-white/10 rounded-2xl h-[60px] md:h-[52px] px-3">
                         <span className="text-xl md:text-2xl font-semibold text-white/50 mr-2">US$</span>
                         <input
@@ -183,7 +253,7 @@ export const PresaleCard = () => {
 
                     {/* Select Crypto */}
                     <div className="w-full">
-                      <span className="text-xs md:text-md text-white/70 mb-1 block">Select Crypto</span>
+                      <span className="text-xs md:text-sm text-white/70 mb-1 block">Select Crypto</span>
                       <div className="w-full cursor-pointer">
                         <button
                           type="button"
@@ -255,30 +325,75 @@ export const PresaleCard = () => {
             </div>
           </div>
 
-          {/* Buy Now Button */}
+          {/* Action / Buy Now Button */}
           <div className="mt-4 w-full space-y-3">
             <button
               id="connectWalletButton"
               onClick={handleBuy}
-              disabled={isBuying || numAmount <= 0}
-              className="group relative flex w-full items-center justify-center gap-4 px-6 h-[56px] rounded-2xl font-semibold cursor-pointer overflow-hidden transition-all duration-300 bg-brand-gradient text-white hover:brightness-110 hover:shadow-[0_0_25px_rgba(232,49,103,0.4)] active:scale-[0.97]"
+              disabled={isBuying || (account && isCorrectNetwork && numAmount <= 0)}
+              className="group relative flex w-full items-center justify-center gap-4 px-6 h-[56px] rounded-2xl font-semibold cursor-pointer overflow-hidden transition-all duration-300 bg-brand-gradient text-white hover:brightness-110 hover:shadow-[0_0_25px_rgba(232,49,103,0.4)] active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
             >
               <span className="relative h-[32px] overflow-hidden leading-none">
                 <span className="block text-xl capitalize transition-transform duration-300 group-hover:-translate-y-full">
-                  {isBuying ? 'Processing...' : 'Buy Now'}
+                  {!account
+                    ? 'Connect MetaMask'
+                    : !isCorrectNetwork
+                    ? 'Switch Network to BSC'
+                    : isBuying
+                    ? 'Processing...'
+                    : `Buy Now with ${selectedCrypto.symbol === 'BNB' ? 'BNB' : 'USDT'}`}
                 </span>
                 <span className="absolute inset-0 translate-y-full text-xl capitalize transition-transform duration-300 group-hover:translate-y-0">
-                  {isBuying ? 'Processing...' : 'Buy Now'}
+                  {!account
+                    ? 'Connect MetaMask'
+                    : !isCorrectNetwork
+                    ? 'Switch Network to BSC'
+                    : isBuying
+                    ? 'Processing...'
+                    : `Buy Now with ${selectedCrypto.symbol === 'BNB' ? 'BNB' : 'USDT'}`}
                 </span>
               </span>
               <span className="flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300 bg-white text-black group-hover:rotate-45">
                 <ArrowUpRight size={18} />
               </span>
             </button>
-            {txSuccess && (
-              <p className="text-center text-sm font-medium text-emerald-400 animate-pulse">
-                ✓ Order placed successfully! Check Live Auction Activity below.
-              </p>
+
+            {/* In-Flight Status */}
+            {isBuying && (
+              <div className="flex items-center justify-center gap-2 p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl text-blue-300 text-xs animate-pulse">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping"></span>
+                <span>{buyStatus}</span>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="flex items-center gap-2 p-3 bg-red-500/15 border border-red-500/30 rounded-xl text-red-300 text-xs">
+                <AlertCircle size={16} className="shrink-0 text-red-400" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Transaction Success Alert */}
+            {lastTxHash && (
+              <div className="p-3.5 bg-emerald-500/15 border border-emerald-500/30 rounded-2xl text-left space-y-1.5 animate-fade-in">
+                <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm">
+                  <CheckCircle2 size={16} />
+                  <span>Transaction Confirmed on BSC!</span>
+                </div>
+                <p className="text-xs text-gray-300">
+                  Your purchase was recorded on the presale ledger. SHUK13 tokens will be distributed by the treasury.
+                </p>
+                <a
+                  href={`https://bscscan.com/tx/${lastTxHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 underline font-mono pt-1"
+                >
+                  <span>View on BscScan ({lastTxHash.slice(0, 10)}...{lastTxHash.slice(-8)})</span>
+                  <ExternalLink size={12} />
+                </a>
+              </div>
             )}
           </div>
         </div>

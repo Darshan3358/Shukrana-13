@@ -10,7 +10,7 @@ export const initialPresaleData = {
   totalUsdRaised: 12337211.48,
   targetUsdt: 151250000,
   totalInvestors: 19240,
-  contractAddress: "Bm2y8RLPLeZuvUfQ7m3UKRiHGewTpzYt7pX8ZpzimM7d"
+  contractAddress: "0x860d6Ee29C12A0C023Fc03741348Dd3d15596f95"
 };
 
 export const initialRecentPayments = [

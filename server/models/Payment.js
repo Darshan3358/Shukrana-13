@@ -6,6 +6,9 @@ const PaymentSchema = new mongoose.Schema({
   usdValue: { type: String, required: true },
   tokenAmount: { type: String, required: true },
   txHash: { type: String, required: true, unique: true },
+  walletAddress: { type: String, default: null },
+  distributed: { type: Boolean, default: false },
+  distributionTxHash: { type: String, default: null },
   tokenPriceUsd: { type: String, default: '0.03633000' },
   createdAt: { type: Date, default: Date.now }
 });

@@ -43,7 +43,7 @@ export const NetworkNode = () => {
 
           {/* Binance Web3 Feature Card */}
           <a
-            href="https://web3.binance.com/en-IN/token/sol/Bm2y8RLPLeZuvUfQ7m3UKRiHGewTpzYt7pX8ZpzimM7d?utm_source=hometokensearch&utm_medium=binance"
+            href="https://bscscan.com/token/0x860d6Ee29C12A0C023Fc03741348Dd3d15596f95"
             target="_blank"
             rel="noopener noreferrer"
             className="relative mt-8 rounded-[3rem] overflow-hidden bg-white/5 border border-white/20 p-3 group cursor-pointer block max-w-full shadow-2xl transition-transform hover:scale-[1.02]"

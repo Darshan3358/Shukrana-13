@@ -12,7 +12,8 @@ const PresaleConfigSchema = new mongoose.Schema({
   totalUsdRaised: { type: Number, default: 12337211.48 },
   targetUsdt: { type: Number, default: 151250000 },
   totalInvestors: { type: Number, default: 19240 },
-  contractAddress: { type: String, default: 'Bm2y8RLPLeZuvUfQ7m3UKRiHGewTpzYt7pX8ZpzimM7d' },
+  contractAddress: { type: String, default: '0x860d6Ee29C12A0C023Fc03741348Dd3d15596f95' },
+  isPaused: { type: Boolean, default: false },
   updatedAt: { type: Date, default: Date.now }
 });
 
