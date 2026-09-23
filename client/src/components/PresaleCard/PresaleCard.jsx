@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Wallet, CreditCard, ChevronDown, ArrowUpRight, CheckCircle2, ExternalLink, AlertCircle } from 'lucide-react';
+import { TrendingUp, Wallet, CreditCard, ChevronDown, ArrowUpRight, CheckCircle2, ExternalLink, AlertCircle, ShieldCheck } from 'lucide-react';
 import CryptoModal from './CryptoModal';
 import { getPresalePrice } from '../../services/api';
 import { useWallet } from '../../context/WalletContext';
@@ -357,6 +357,21 @@ export const PresaleCard = () => {
                 <ArrowUpRight size={18} />
               </span>
             </button>
+
+            {/* Verified Contract Security Badge */}
+            <div className="flex items-center justify-center gap-1.5 py-1 text-xs text-emerald-400">
+              <ShieldCheck size={14} className="text-emerald-400 shrink-0" />
+              <span>Verified BEP-20 Contract:</span>
+              <a
+                href="https://bscscan.com/token/0x860d6Ee29C12A0C023Fc03741348Dd3d15596f95"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-emerald-300 font-mono text-[11px] inline-flex items-center gap-0.5"
+              >
+                <span>0x860d...6f95</span>
+                <ExternalLink size={10} />
+              </a>
+            </div>
 
             {/* In-Flight Status */}
             {isBuying && (

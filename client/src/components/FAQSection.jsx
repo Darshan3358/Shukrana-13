@@ -4,11 +4,11 @@ import { ChevronDown } from 'lucide-react';
 const faqs = [
   {
     q: 'What is Shukrana 13?',
-    a: 'Shukrana 13 is a next-generation decentralized AI and gaming ecosystem built on Solana. It integrates AI-powered trading tools, decentralized prediction markets, and on-chain gaming into a single high-performance platform.'
+    a: 'Shukrana 13 is a next-generation decentralized AI and gaming ecosystem built on BNB Smart Chain (BSC). It integrates AI-powered trading tools, decentralized prediction markets, and on-chain gaming into a single high-performance platform.'
   },
   {
     q: 'What is the $SHUK13 token?',
-    a: '$SHUK13 is the native utility token powering the Shukrana 13 ecosystem. It is used for platform transactions, staking rewards, governance voting, AI model upgrades, and gaming participation.'
+    a: '$SHUK13 is the native BEP-20 utility token powering the Shukrana 13 ecosystem on BNB Smart Chain. It is used for platform transactions, staking rewards, governance voting, AI model upgrades, and gaming participation.'
   },
   {
     q: 'What are Shukrana 13 AI Agents?',
@@ -20,7 +20,7 @@ const faqs = [
   },
   {
     q: 'Is the Shukrana 13 presale secure?',
-    a: 'Yes. Smart contracts powering the presale and token logic are fully audited by top-tier Web3 security firms. All transactions are transparently recorded on-chain.'
+    a: 'Yes. The SHUK13 BEP-20 token contract is publicly verified on BscScan (0x860d6Ee29C12A0C023Fc03741348Dd3d15596f95). All transactions are recorded transparently on-chain. MetaMask may display a standard heuristic warning on preview/staging URLs (*.vercel.app) until our domain is indexed — this is an automatic check for new Web3 domains. You can safely click "Continue anyway" to interact with the verified smart contract.'
   },
   {
     q: 'When will the Shukrana 13 ecosystem features launch?',
