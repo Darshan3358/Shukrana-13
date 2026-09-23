@@ -164,6 +164,14 @@ export const Navbar = () => {
                     </div>
 
                     <div className="pt-3 space-y-2 text-xs">
+                      <Link
+                        to="/profile"
+                        onClick={() => setWalletDropdownOpen(false)}
+                        className="flex items-center justify-between p-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 font-semibold transition"
+                      >
+                        <span>📊 User Dashboard</span>
+                        <ArrowUpRight size={14} />
+                      </Link>
                       {account?.toLowerCase() === '0x4f2766f649e23bc2db54753c16d22066bed64bac' && (
                         <Link
                           to="/admin"
@@ -275,6 +283,13 @@ export const Navbar = () => {
                   <div className="text-xs text-gray-400">Wallet Connected:</div>
                   <div className="font-mono text-xs text-white break-all">{account}</div>
                   <div className="text-sm font-bold text-emerald-400 mt-1">{shukBalance} SHUK13</div>
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="mt-2 block w-full text-center py-2 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-400 font-semibold text-xs transition"
+                  >
+                    📊 Open User Dashboard
+                  </Link>
                   {account?.toLowerCase() === '0x4f2766f649e23bc2db54753c16d22066bed64bac' && (
                     <Link
                       to="/admin"
