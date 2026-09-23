@@ -1,5 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowUpRight, Wallet, Check, Copy, ExternalLink, LogOut, ChevronDown, AlertTriangle } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Wallet,
+  Check,
+  Copy,
+  ExternalLink,
+  LogOut,
+  ChevronDown,
+  AlertTriangle,
+  User as UserIcon
+} from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useWallet } from '../context/WalletContext';
 
@@ -119,59 +129,72 @@ export const Navbar = () => {
                 <span>Switch to BSC</span>
               </button>
             ) : (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setWalletDropdownOpen(!walletDropdownOpen)}
-                  className="flex items-center gap-2.5 px-3.5 h-[48px] rounded-xl bg-black/80 border border-white/15 hover:border-white/30 text-white transition-all cursor-pointer shadow-lg"
+              <>
+                {/* 👤 Profile icon — only visible when wallet is connected */}
+                <Link
+                  to="/profile"
+                  className="group flex items-center justify-center w-[48px] h-[48px] rounded-xl bg-black/80 border border-white/15 hover:border-emerald-400/50 hover:bg-emerald-500/10 text-white transition-all shadow-lg"
+                  title="My Investor Profile"
                 >
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <div className="flex flex-col text-left leading-tight">
-                    <span className="text-xs text-emerald-400 font-semibold">{shukBalance} SHUK13</span>
-                    <span className="text-[12px] font-mono text-gray-300">
-                      {account.slice(0, 6)}...{account.slice(-4)}
-                    </span>
-                  </div>
-                  <ChevronDown size={14} className="text-gray-400 ml-1" />
-                </button>
+                  <UserIcon 
+                    size={20} 
+                    className="text-gray-300 group-hover:text-emerald-400 transition-colors" 
+                  />
+                </Link>
 
-                {walletDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-72 bg-[#0d121f] border border-white/15 rounded-2xl p-4 shadow-2xl z-50 text-white animate-fade-in">
-                    <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                      <span className="text-xs text-gray-400 uppercase font-semibold">Connected Wallet</span>
-                      <span className="text-[11px] px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 font-medium">
-                        BSC Mainnet
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setWalletDropdownOpen(!walletDropdownOpen)}
+                    className="flex items-center gap-2.5 px-3.5 h-[48px] rounded-xl bg-black/80 border border-white/15 hover:border-white/30 text-white transition-all cursor-pointer shadow-lg"
+                  >
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <div className="flex flex-col text-left leading-tight">
+                      <span className="text-xs text-emerald-400 font-semibold">{shukBalance} SHUK13</span>
+                      <span className="text-[12px] font-mono text-gray-300">
+                        {account.slice(0, 6)}...{account.slice(-4)}
                       </span>
                     </div>
+                    <ChevronDown size={14} className="text-gray-400 ml-1" />
+                  </button>
 
-                    <div className="py-3 space-y-2 border-b border-white/10">
-                      <div className="flex items-center justify-between bg-black/50 p-2 rounded-xl border border-white/5">
-                        <span className="font-mono text-xs text-gray-300 truncate max-w-[170px]">
-                          {account}
+                  {walletDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-72 bg-[#0d121f] border border-white/15 rounded-2xl p-4 shadow-2xl z-50 text-white animate-fade-in">
+                      <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                        <span className="text-xs text-gray-400 uppercase font-semibold">Connected Wallet</span>
+                        <span className="text-[11px] px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 font-medium">
+                          BSC Mainnet
                         </span>
-                        <button
-                          onClick={copyAddress}
-                          className="p-1.5 hover:bg-white/10 rounded-lg text-gray-300 hover:text-white transition"
-                          title="Copy Address"
+                      </div>
+
+                      <div className="py-3 space-y-2 border-b border-white/10">
+                        <div className="flex items-center justify-between bg-black/50 p-2 rounded-xl border border-white/5">
+                          <span className="font-mono text-xs text-gray-300 truncate max-w-[170px]">
+                            {account}
+                          </span>
+                          <button
+                            onClick={copyAddress}
+                            className="p-1.5 hover:bg-white/10 rounded-lg text-gray-300 hover:text-white transition"
+                            title="Copy Address"
+                          >
+                            {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                          </button>
+                        </div>
+
+                        <div className="bg-black/30 p-2.5 rounded-xl border border-white/5">
+                          <div className="text-[11px] text-gray-400">SHUK13 Balance</div>
+                          <div className="text-base font-bold text-emerald-400">{shukBalance} SHUK13</div>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 space-y-2 text-xs">
+                        <Link
+                          to="/profile"
+                          onClick={() => setWalletDropdownOpen(false)}
+                          className="flex items-center justify-between p-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 font-semibold transition"
                         >
-                          {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-                        </button>
-                      </div>
-
-                      <div className="bg-black/30 p-2.5 rounded-xl border border-white/5">
-                        <div className="text-[11px] text-gray-400">SHUK13 Balance</div>
-                        <div className="text-base font-bold text-emerald-400">{shukBalance} SHUK13</div>
-                      </div>
-                    </div>
-
-                    <div className="pt-3 space-y-2 text-xs">
-                      <Link
-                        to="/profile"
-                        onClick={() => setWalletDropdownOpen(false)}
-                        className="flex items-center justify-between p-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 font-semibold transition"
-                      >
-                        <span>📊 User Dashboard</span>
-                        <ArrowUpRight size={14} />
-                      </Link>
+                          <span>👤 My Investor Profile</span>
+                          <ArrowUpRight size={14} />
+                        </Link>
                       {account?.toLowerCase() === '0x4f2766f649e23bc2db54753c16d22066bed64bac' && (
                         <Link
                           to="/admin"
@@ -205,48 +228,60 @@ export const Navbar = () => {
                   </div>
                 )}
               </div>
-            )}
+            </>
+          )}
 
-            <a
-              href="#presale"
-              onClick={(e) => scrollToSection(e, '#presale')}
-              className="group relative inline-flex items-center gap-4 px-6 h-[48px] rounded-xl font-semibold cursor-pointer overflow-hidden transition-all duration-300 bg-white text-black hover:bg-white/90 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] active:scale-[0.97]"
+          <a
+            href="#presale"
+            onClick={(e) => scrollToSection(e, '#presale')}
+            className="group relative inline-flex items-center gap-4 px-6 h-[48px] rounded-xl font-semibold cursor-pointer overflow-hidden transition-all duration-300 bg-white text-black hover:bg-white/90 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] active:scale-[0.97]"
+          >
+            <span className="relative overflow-hidden leading-none">
+              <span className="block text-lg capitalize transition-transform duration-300 group-hover:-translate-y-full">
+                Buy Now
+              </span>
+              <span className="absolute inset-0 translate-y-full text-lg capitalize transition-transform duration-300 group-hover:translate-y-0">
+                Buy Now
+              </span>
+            </span>
+            <span className="flex items-center justify-center w-7 h-7 rounded-lg transition-all duration-300 bg-brand-gradient text-white group-hover:rotate-45">
+              <ArrowUpRight size={15} />
+            </span>
+          </a>
+        </div>
+
+        {/* Mobile Actions */}
+        <div className="lg:hidden flex items-center gap-2">
+          {!account ? (
+            <button
+              onClick={connectWallet}
+              className="bg-brand-gradient text-white font-semibold text-xs py-2 px-3 rounded-xl active:scale-95"
             >
-              <span className="relative overflow-hidden leading-none">
-                <span className="block text-lg capitalize transition-transform duration-300 group-hover:-translate-y-full">
-                  Buy Now
-                </span>
-                <span className="absolute inset-0 translate-y-full text-lg capitalize transition-transform duration-300 group-hover:translate-y-0">
-                  Buy Now
-                </span>
-              </span>
-              <span className="flex items-center justify-center w-7 h-7 rounded-lg transition-all duration-300 bg-brand-gradient text-white group-hover:rotate-45">
-                <ArrowUpRight size={15} />
-              </span>
-            </a>
-          </div>
-
-          {/* Mobile Actions */}
-          <div className="lg:hidden flex items-center gap-2">
-            {!account ? (
-              <button
-                onClick={connectWallet}
-                className="bg-brand-gradient text-white font-semibold text-xs py-2 px-3 rounded-xl active:scale-95"
-              >
-                Connect
-              </button>
-            ) : !isCorrectNetwork ? (
-              <button
-                onClick={switchToBsc}
-                className="bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 font-semibold text-xs py-2 px-2.5 rounded-xl"
-              >
-                Switch BSC
-              </button>
-            ) : (
+              Connect
+            </button>
+          ) : !isCorrectNetwork ? (
+            <button
+              onClick={switchToBsc}
+              className="bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 font-semibold text-xs py-2 px-2.5 rounded-xl"
+            >
+              Switch BSC
+            </button>
+          ) : (
+            <>
               <span className="font-mono text-xs text-emerald-400 bg-black/60 px-2.5 py-1.5 rounded-xl border border-white/10">
                 {account.slice(0, 4)}...{account.slice(-3)}
               </span>
-            )}
+
+              {/* 👤 Mobile profile icon */}
+              <Link
+                to="/profile"
+                className="flex items-center justify-center w-9 h-9 rounded-xl bg-black/60 border border-white/10 text-gray-300 hover:text-emerald-400 active:scale-95 transition-colors"
+                title="My Profile"
+              >
+                <UserIcon size={16} />
+              </Link>
+            </>
+          )}
 
             <button
               onClick={() => setMobileMenuOpen(true)}

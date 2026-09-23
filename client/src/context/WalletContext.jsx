@@ -62,6 +62,18 @@ export function WalletProvider({ children }) {
       const cid = await web3Service.getChainId();
       setChainId(cid);
       await refreshBalances(connectedAccount);
+
+      // ✅ Save wallet address to MongoDB
+      try {
+        await api.post('/users/register', {
+          walletAddress: connectedAccount,
+          chainId: cid
+        });
+        console.log('✓ Wallet registered:', connectedAccount);
+      } catch (err) {
+        console.warn('Wallet register notice:', err?.message);
+      }
+
       return connectedAccount;
     } catch (err) {
       console.error("Wallet connection error:", err);
@@ -119,6 +131,16 @@ export function WalletProvider({ children }) {
         walletAddress: account, // Real wallet address
         tokenAmount: tokensBought
       });
+
+      // Update user record to mark as investor
+      try {
+        await api.put(`/users/${account}/mark-investor`, {
+          additionalUsd: parseFloat(amountUSD),
+          additionalTokens: parseFloat(tokensBought)
+        });
+      } catch (userErr) {
+        console.warn('User update notice:', userErr?.message);
+      }
     } catch (apiErr) {
       console.warn("Backend payment ledger notification:", apiErr);
     }
@@ -138,6 +160,16 @@ export function WalletProvider({ children }) {
         if (accounts && accounts.length > 0) {
           setAccount(accounts[0]);
           refreshBalances(accounts[0]);
+
+          // ✅ Register the returning wallet silently
+          try {
+            await api.post('/users/register', {
+              walletAddress: accounts[0],
+              chainId: cid
+            });
+          } catch (err) {
+            console.warn('Silent register notice:', err?.message);
+          }
         }
       }
     }

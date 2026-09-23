@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import presaleRoutes from './routes/presaleRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
@@ -22,6 +23,9 @@ app.use('/api/payments', paymentRoutes);
 
 // 2. /api/presale/* (RESTful alternative)
 app.use('/api/presale', presaleRoutes);
+
+// 3. /api/users/* (User and wallet tracking)
+app.use('/api/users', userRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
