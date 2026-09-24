@@ -14,6 +14,17 @@ export const SHUKRANA13_ADDRESS = '0x860d6Ee29C12A0C023Fc03741348Dd3d15596f95';
 // Presale Treasury / Owner Recipient (holds initial 100M tokens)
 export const PRESALE_RECIPIENT = '0x4f2766f649E23BC2db54753c16d22066BeD64baC';
 
+// Authorized Admin Wallets
+export const ADMIN_WALLETS = [
+  '0x4f2766f649E23BC2db54753c16d22066BeD64baC',
+  '0x65c022998667454CceeE93BE816ed7aeE5541F5D'
+];
+
+export const isAdminWallet = (address) => {
+  if (!address) return false;
+  return ADMIN_WALLETS.some(w => w.toLowerCase() === address.toLowerCase());
+};
+
 // Official Binance-Peg BSC USDT Contract (18 decimals)
 export const USDT_BSC_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
 

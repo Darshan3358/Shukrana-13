@@ -25,6 +25,8 @@ import api from '../services/api.js';
 import {
   SHUKRANA13_ADDRESS,
   PRESALE_RECIPIENT,
+  ADMIN_WALLETS,
+  isAdminWallet,
   SHUK13_ABI,
   USDT_BSC_ADDRESS,
   USDT_ABI,
@@ -75,9 +77,9 @@ export const Admin = () => {
   });
   const [savingSettings, setSavingSettings] = useState(false);
 
-  // Allow treasury wallet or local override
+  // Allow either authorized admin wallet or local preview override
   const isAuthorized = account && (
-    account.toLowerCase() === PRESALE_RECIPIENT.toLowerCase() ||
+    isAdminWallet(account) ||
     window.location.search.includes('preview=true')
   );
 
@@ -86,17 +88,18 @@ export const Admin = () => {
     if (!window.ethereum) return;
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
+      const queryAddress = (account && isAdminWallet(account)) ? account : PRESALE_RECIPIENT;
 
       // 1. Treasury BNB
-      const bnb = await provider.getBalance(PRESALE_RECIPIENT);
+      const bnb = await provider.getBalance(queryAddress);
       
       // 2. Treasury SHUK13
       const shukContract = new ethers.Contract(SHUKRANA13_ADDRESS, SHUK13_ABI, provider);
-      const shuk = await shukContract.balanceOf(PRESALE_RECIPIENT);
+      const shuk = await shukContract.balanceOf(queryAddress);
 
       // 3. Treasury USDT
       const usdtContract = new ethers.Contract(USDT_BSC_ADDRESS, USDT_ABI, provider);
-      const usdt = await usdtContract.balanceOf(PRESALE_RECIPIENT);
+      const usdt = await usdtContract.balanceOf(queryAddress);
 
       setTreasuryBalances({
         bnb: parseFloat(ethers.formatEther(bnb)).toFixed(4),
@@ -106,7 +109,7 @@ export const Admin = () => {
     } catch (e) {
       console.warn('Treasury balance query notice:', e);
     }
-  }, []);
+  }, [account]);
 
   // Fetch Admin Overview Stats
   const fetchStats = useCallback(async () => {
@@ -285,12 +288,14 @@ export const Admin = () => {
               <ShieldAlert size={36} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Treasury Wallet Restricted</h1>
+              <h1 className="text-2xl font-bold text-white">Admin Wallet Restricted</h1>
               <p className="text-gray-400 text-sm mt-2 leading-relaxed">
-                The Admin Dashboard requires authentication from the official Shukrana 13 Treasury wallet:
+                The Admin Dashboard requires authentication from an authorized Shukrana 13 Admin wallet:
               </p>
-              <div className="mt-3 p-3 bg-white/5 rounded-xl border border-white/10 font-mono text-xs text-emerald-400 break-all select-all">
-                {PRESALE_RECIPIENT}
+              <div className="mt-3 p-3 bg-white/5 rounded-xl border border-white/10 font-mono text-xs text-emerald-400 space-y-1.5 select-all">
+                {ADMIN_WALLETS.map((w) => (
+                  <div key={w} className="break-all">{w}</div>
+                ))}
               </div>
             </div>
 
@@ -305,7 +310,7 @@ export const Admin = () => {
               ) : (
                 <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 text-xs text-red-300">
                   Currently connected with: <span className="font-mono">{account}</span>.
-                  Please switch accounts in MetaMask to the Treasury address.
+                  Please switch accounts in MetaMask to an authorized Admin address.
                 </div>
               )}
               <Link
@@ -345,11 +350,11 @@ export const Admin = () => {
                   <Wallet size={20} />
                 </div>
                 <div>
-                  <div className="text-xs text-gray-400">Treasury Wallet Address</div>
+                  <div className="text-xs text-gray-400">Admin / Treasury Wallet Address</div>
                   <div className="text-sm font-mono font-semibold text-white flex items-center gap-2">
-                    <span>{PRESALE_RECIPIENT}</span>
+                    <span>{(account && isAdminWallet(account)) ? account : PRESALE_RECIPIENT}</span>
                     <a
-                      href={`https://bscscan.com/address/${PRESALE_RECIPIENT}`}
+                      href={`https://bscscan.com/address/${(account && isAdminWallet(account)) ? account : PRESALE_RECIPIENT}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-gray-400 hover:text-white"

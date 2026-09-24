@@ -23,6 +23,16 @@ export const CONTRACT_ADDRESSES = {
   TREASURY: "0x4f2766f649E23BC2db54753c16d22066BeD64baC"
 };
 
+export const ADMIN_WALLETS = [
+  "0x4f2766f649E23BC2db54753c16d22066BeD64baC",
+  "0x65c022998667454CceeE93BE816ed7aeE5541F5D"
+];
+
+export const isAdminWallet = (address) => {
+  if (!address) return false;
+  return ADMIN_WALLETS.some(w => w.toLowerCase() === address.toLowerCase());
+};
+
 export const SHUK13_ABI = [
   "function name() view returns (string)",
   "function symbol() view returns (string)",

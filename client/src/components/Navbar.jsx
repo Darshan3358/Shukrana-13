@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useWallet } from '../context/WalletContext';
+import { isAdminWallet } from '../constants/contracts';
 
 const navLinks = [
   { id: 'how-to-buy', label: 'How to Buy', href: '#how-to-buy' },
@@ -195,7 +196,7 @@ export const Navbar = () => {
                           <span>👤 My Investor Profile</span>
                           <ArrowUpRight size={14} />
                         </Link>
-                      {account?.toLowerCase() === '0x4f2766f649e23bc2db54753c16d22066bed64bac' && (
+                      {isAdminWallet(account) && (
                         <Link
                           to="/admin"
                           onClick={() => setWalletDropdownOpen(false)}
@@ -328,7 +329,7 @@ export const Navbar = () => {
                   >
                     📊 Open User Dashboard
                   </Link>
-                  {account?.toLowerCase() === '0x4f2766f649e23bc2db54753c16d22066bed64bac' && (
+                  {isAdminWallet(account) && (
                     <Link
                       to="/admin"
                       onClick={() => setMobileMenuOpen(false)}
